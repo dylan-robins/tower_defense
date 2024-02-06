@@ -78,7 +78,7 @@ fn main() {
 fn on_frame(mut app App) {
 	app.frame_count += 1
 	if app.frame_count % 60  == 0 {
-		app.map.ennemis << Ennemi{pos_xy: [app.map.ennemi_spawn[0][0] / f32(2), app.map.ennemi_spawn[0][1] / f32(2)], pos_relatif: 0, circuit: 0}
+		app.map.ennemis << Ennemi{pos_xy: app.map.ennemi_spawn[0].clone(), pos_relatif: 0, circuit: 0}
 	}
 	
 	mut distance_min := f32(90 * 90)
@@ -141,7 +141,7 @@ fn on_frame(mut app App) {
 		for ennemi in app.map.ennemis {
 			if tour.detect(ennemi) && tour.cooldown == 0 {
 				tour.cooldown = 60
-				app.map.projectiles << Projectile{radius: 2, pos: [f32(tour.pos[0]), f32(tour.pos[1])], vitesse: 500, life_span: 120}
+				app.map.projectiles << Projectile{radius: 2, pos: [f32(tour.pos[0]), f32(tour.pos[1])], vitesse: 750, life_span: 120}
 				app.map.projectiles[app.map.projectiles.len - 1].vecteur_directeur = app.map.projectiles[app.map.projectiles.len - 1].find_vector(ennemi, app.map.circuits[ennemi.circuit])
 			}
 		}
