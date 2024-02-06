@@ -69,7 +69,7 @@ fn main() {
 		event_fn: on_event
 		sample_count: 2
 	)
-	app.map = Map {ennemi_spawn: [[0, 384]], circuits: [][][]f32{len: 1, init: [][]f32{len: 2760, init: [index / 2, 384]}}}
+	app.map = Map {ennemi_spawn: [[f32(0), f32(384)]], circuits: [][][]f32{len: 1, init: [][]f32{len: 2760, init: [index / f32(2), f32(384)]}}}
 
 	// lancement du programme/de la fenêtre
 	app.gg.run()
@@ -81,7 +81,7 @@ fn on_frame(mut app App) {
 		app.map.ennemis << Ennemi{pos_xy: [app.map.ennemi_spawn[0][0] / f32(2), app.map.ennemi_spawn[0][1] / f32(2)], pos_relatif: 0, circuit: 0}
 	}
 	
-	mut distance_min := 90 * 90
+	mut distance_min := f32(90 * 90)
 	for circuit in app.map.circuits {
 		for point_circuit in circuit {
 			if (point_circuit[0] - app.gg.mouse_pos_x) * (point_circuit[0] - app.gg.mouse_pos_x) + (point_circuit[1] - app.gg.mouse_pos_y) * (point_circuit[1] - app.gg.mouse_pos_y) < distance_min {
@@ -184,7 +184,7 @@ fn on_event(e &gg.Event, mut app App) {
 	}
 }
 
-fn (e Ennemi) move (circuit [][]int) (int, []f32) {
+fn (e Ennemi) move (circuit [][]f32) (int, []f32) {
 	return e.pos_relatif + 1, circuit[e.pos_relatif + 1].clone()
 }
 
@@ -196,8 +196,8 @@ fn (t Tower) detect (ennemi Ennemi) bool {
 	return detection
 }
 
-fn (p Projectile) find_vector (ennemi Ennemi, circuit[][]int) []f32 {
-	norme := f32((circuit[ennemi.pos_relatif][0] - p.pos[0]) * (circuit[ennemi.pos_relatif][0] - p.pos[0]) + (circuit[ennemi.pos_relatif][1] - p.pos[1]) * (circuit[ennemi.pos_relatif][1] - p.pos[1]))
+fn (p Projectile) find_vector (ennemi Ennemi, circuit[][]f32) []f32 {
+	norme := (circuit[ennemi.pos_relatif][0] - p.pos[0]) * (circuit[ennemi.pos_relatif][0] - p.pos[0]) + (circuit[ennemi.pos_relatif][1] - p.pos[1]) * (circuit[ennemi.pos_relatif][1] - p.pos[1])
 	return [((circuit[ennemi.pos_relatif][0] - p.pos[0]) / norme) * p.vitesse, ((circuit[ennemi.pos_relatif][1] - p.pos[1]) / norme) * p.vitesse]
 }
 
