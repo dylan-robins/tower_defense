@@ -185,7 +185,7 @@ fn on_event(e &gg.Event, mut app App) {
 }
 
 fn (e Ennemi) move (circuit [][]int) (int, []f32) {
-	return e.pos_relatif + 1, [circuit[e.pos_relatif + 1][0] / f32(2), circuit[e.pos_relatif + 1][1] / f32(2)]
+	return e.pos_relatif + 1, circuit[e.pos_relatif + 1].clone()
 }
 
 fn (t Tower) detect (ennemi Ennemi) bool {
