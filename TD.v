@@ -25,11 +25,14 @@ mut:
 	pv int
 	placing_mode bool
 	can_place bool
+	money int
 }
 
 struct Ennemi {
 	circuit int
 	radius int
+	degats int
+	money int
 mut:
 	pos_xy []f32
 	pos_relatif int
@@ -41,6 +44,7 @@ struct Tower {
 	range int
 	degats int
 	pos []int
+	prix int
 mut:
 	cooldown int = 60
 }
@@ -70,67 +74,66 @@ fn main() {
 		event_fn: on_event
 		sample_count: 2
 	)
-	app.map = Map {ennemi_spawn: [[f32(0), f32(384)]], circuits: [][][]f32{len: 1, init: [][]f32{len: 2760, init: [index / f32(2), f32(384)]}}}
+	app.map = Map {ennemi_spawn: [[f32(0), f32(384)]], circuits: [][][]f32{len: 1, init: [][]f32{len: 2760, init: [index / f32(2), f32(384)]}}, money: 40, pv: 10}
 
 	// lancement du programme/de la fenêtre
 	app.gg.run()
 }
 
 fn on_frame(mut app App) {
-	app.frame_count += 1
-	if app.frame_count % 60  == 0 {
-		app.map.ennemis << Ennemi{pos_xy: app.map.ennemi_spawn[0].clone(), radius: 10, pos_relatif: 0, circuit: 0, pv: 5}
-	}
-	
-	mut distance_min := f32(90 * 90)
-	for circuit in app.map.circuits {
-		for point_circuit in circuit {
-			if (point_circuit[0] - app.gg.mouse_pos_x) * (point_circuit[0] - app.gg.mouse_pos_x) + (point_circuit[1] - app.gg.mouse_pos_y) * (point_circuit[1] - app.gg.mouse_pos_y) < distance_min {
-				distance_min = (point_circuit[0] - app.gg.mouse_pos_x) * (point_circuit[0] - app.gg.mouse_pos_x) + (point_circuit[1] - app.gg.mouse_pos_y) * (point_circuit[1] - app.gg.mouse_pos_y)
+	if app.map.pv > 0 {
+		app.frame_count += 1
+		if app.frame_count % 60  == 0 {
+			app.map.ennemis << Ennemi{pos_xy: app.map.ennemi_spawn[0].clone(), radius: 10, pos_relatif: 0, circuit: 0, pv: 5 + app.frame_count / 350, degats: 1}
+		}
+		
+		mut distance_min := f32(90 * 90)
+		for circuit in app.map.circuits {
+			for point_circuit in circuit {
+				if (point_circuit[0] - app.gg.mouse_pos_x) * (point_circuit[0] - app.gg.mouse_pos_x) + (point_circuit[1] - app.gg.mouse_pos_y) * (point_circuit[1] - app.gg.mouse_pos_y) < distance_min {
+					distance_min = (point_circuit[0] - app.gg.mouse_pos_x) * (point_circuit[0] - app.gg.mouse_pos_x) + (point_circuit[1] - app.gg.mouse_pos_y) * (point_circuit[1] - app.gg.mouse_pos_y)
+				}
 			}
 		}
-	}
-	mut collision := false
-	for tours in app.map.tours {
-		if gerer_collision_tour([app.gg.mouse_pos_x, app.gg.mouse_pos_y, 10], tours) {
-			collision = true
-		}
-	}
-	if distance_min < 90 * 90 || collision {
-		app.map.can_place = false
-	} else {
-		app.map.can_place = true
-	}
-	
-	mut projectile_delete_indexes := []int{}
-	for mut projectile in app.map.projectiles {
-		projectile.pos[0] += projectile.vecteur_directeur[0]
-		projectile.pos[1] += projectile.vecteur_directeur[1]
-		projectile.life_span -= 1
-		for mut ennemi in app.map.ennemis {
-			if gerer_collision_projectile_ennemi(ennemi, projectile) {
-				projectile.life_span = 0
-				ennemi.pv -= projectile.degats
+		mut collision := false
+		for tours in app.map.tours {
+			if gerer_collision_tour([app.gg.mouse_pos_x, app.gg.mouse_pos_y, 10], tours) {
+				collision = true
 			}
 		}
-		if projectile.life_span <= 0 {
-			projectile_delete_indexes << app.map.projectiles.index(projectile)
+		if distance_min < 90 * 90 || collision || app.map.money < 10{
+			app.map.can_place = false
+		} else {
+			app.map.can_place = true
 		}
-	}
-	dump(projectile_delete_indexes)
-	dump(projectile_delete_indexes.len)
-	dump(app.map.projectiles)
-	if app.map.projectiles.len > 0 {
-		dump(app.map.projectiles[0])
-	}
-	for projectile_delete_indexes.len > 0 {
-		for mut projectile_delete_index in projectile_delete_indexes {
-			if projectile_delete_indexes[0] < projectile_delete_index {
-				projectile_delete_index -= 1
+		
+		mut projectile_delete_indexes := []int{}
+		for mut projectile in app.map.projectiles {
+			projectile.pos[0] += projectile.vecteur_directeur[0]
+			projectile.pos[1] += projectile.vecteur_directeur[1]
+			projectile.life_span -= 1
+			for mut ennemi in app.map.ennemis {
+				if gerer_collision_projectile_ennemi(ennemi, projectile) {
+					projectile.life_span = 0
+					ennemi.pv -= projectile.degats
+				}
+			}
+			if projectile.life_span <= 0 {
+				projectile_delete_indexes << app.map.projectiles.index(projectile)
 			}
 		}
-		app.map.projectiles.delete(projectile_delete_indexes[0])
-		projectile_delete_indexes.delete(0)
+		if app.map.projectiles.len > 0 {
+			dump(app.map.projectiles[0])
+		}
+		for projectile_delete_indexes.len > 0 {
+			for mut projectile_delete_index in projectile_delete_indexes {
+				if projectile_delete_indexes[0] < projectile_delete_index {
+					projectile_delete_index -= 1
+				}
+			}
+			app.map.projectiles.delete(projectile_delete_indexes[0])
+			projectile_delete_indexes.delete(0)
+		}
 	}
 	
 	// Draw
@@ -149,6 +152,13 @@ fn on_frame(mut app App) {
 		for mut index in indexes {
 			if indexes[0] < index {
 				index -=1
+			}
+		}
+		if app.map.pv > 0 {
+			if app.map.ennemis[indexes[0]].pos_relatif == app.map.circuits[app.map.ennemis[indexes[0]].circuit].len - 1 {
+				app.map.pv -= app.map.ennemis[indexes[0]].degats
+			} else {
+				app.map.money += 2
 			}
 		}
 		app.map.ennemis.delete(indexes[0])
@@ -181,6 +191,10 @@ fn on_frame(mut app App) {
 		app.gg.draw_circle_filled(projectile.pos[0], projectile.pos[1], projectile.radius, gg.Color{})
 	}
 	app.gg.show_fps()
+	app.gg.draw_text(1200, 10, "money : ${app.map.money}    pv : ${app.map.pv}")
+	if app.map.pv <= 0 {
+		app.gg.draw_text(650, 368, "YOU LOSE! You survived for ${app.frame_count / 60}seconds !")
+	}
 	app.gg.end()
 }
 
@@ -206,6 +220,7 @@ fn on_event(e &gg.Event, mut app App) {
 				.enter {
 					if app.map.placing_mode && app.map.can_place {
 						app.map.tours << Tower{radius: 10, pos: [app.gg.mouse_pos_x, app.gg.mouse_pos_y], range: 100}
+						app.map.money -= 10
 					}
 				}
 				else {}
