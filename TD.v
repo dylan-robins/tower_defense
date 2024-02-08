@@ -29,6 +29,7 @@ mut:
 
 struct Ennemi {
 	circuit int
+	radius int
 mut:
 	pos_xy []f32
 	pos_relatif int
@@ -78,7 +79,7 @@ fn main() {
 fn on_frame(mut app App) {
 	app.frame_count += 1
 	if app.frame_count % 60  == 0 {
-		app.map.ennemis << Ennemi{pos_xy: app.map.ennemi_spawn[0].clone(), pos_relatif: 0, circuit: 0}
+		app.map.ennemis << Ennemi{pos_xy: app.map.ennemi_spawn[0].clone(), radius: 10, pos_relatif: 0, circuit: 0}
 	}
 	
 	mut distance_min := f32(90 * 90)
@@ -89,7 +90,13 @@ fn on_frame(mut app App) {
 			}
 		}
 	}
-	if distance_min < 90 * 90 {
+	mut collision := false
+	for tours in app.map.tours {
+		if gerer_collision_tour([app.gg.mouse_pos_x, app.gg.mouse_pos_y, 10], tours) {
+			collision = true
+		}
+	}
+	if distance_min < 90 * 90 || collision {
 		app.map.can_place = false
 	} else {
 		app.map.can_place = true
@@ -113,7 +120,7 @@ fn on_frame(mut app App) {
 	app.gg.draw_rect_filled(0, 2 * app.gg.window_size().height/5, app.gg.window_size().width, app.gg.window_size().height/5, gg.Color{r: 217, g: 186, b: 111})
 	mut indexes := []int{}
 	for mut ennemi in app.map.ennemis {
-		app.gg.draw_circle_filled(ennemi.pos_xy[0], ennemi.pos_xy[1], 10, gg.Color{r: 255})
+		app.gg.draw_circle_filled(ennemi.pos_xy[0], ennemi.pos_xy[1], ennemi.radius, gg.Color{r: 255})
 		if ennemi.pos_relatif < app.map.circuits[ennemi.circuit].len - 1 {
 			ennemi.pos_relatif, ennemi.pos_xy =  ennemi.move(app.map.circuits[ennemi.circuit])
 		} else {
@@ -174,7 +181,7 @@ fn on_event(e &gg.Event, mut app App) {
 			match e.key_code {
 				.enter {
 					if app.map.placing_mode && app.map.can_place {
-						app.map.tours << Tower{radius:10, pos: [app.gg.mouse_pos_x, app.gg.mouse_pos_y], range: 100}
+						app.map.tours << Tower{radius: 10, pos: [app.gg.mouse_pos_x, app.gg.mouse_pos_y], range: 100}
 					}
 				}
 				else {}
@@ -190,7 +197,7 @@ fn (e Ennemi) move (circuit [][]f32) (int, []f32) {
 
 fn (t Tower) detect (ennemi Ennemi) bool {
 	mut detection := false
-	if (ennemi.pos_xy[0] - t.pos[0]) * (ennemi.pos_xy[0] - t.pos[0]) + (ennemi.pos_xy[1] - t.pos[1]) * (ennemi.pos_xy[1] - t.pos[1]) <= t.range * t.range {
+	if (ennemi.pos_xy[0] - t.pos[0]) * (ennemi.pos_xy[0] - t.pos[0]) + (ennemi.pos_xy[1] - t.pos[1]) * (ennemi.pos_xy[1] - t.pos[1]) <= (t.range + ennemi.radius) * (t.range + ennemi.radius) {
 		detection = true
 	}
 	return detection
@@ -201,9 +208,13 @@ fn (p Projectile) find_vector (ennemi Ennemi, circuit[][]f32) []f32 {
 	return [((circuit[ennemi.pos_relatif][0] - p.pos[0]) / norme) * p.vitesse, ((circuit[ennemi.pos_relatif][1] - p.pos[1]) / norme) * p.vitesse]
 }
 
-//fn (p Projectile) move () []int {
-	
-//}
+fn gerer_collision_tour (tour1 []int, tour2 Tower) bool {
+	mut collision := false
+	if (tour1[0] - tour2.pos[0]) * (tour1[0] - tour2.pos[0]) + (tour1[1] - tour2.pos[1]) * (tour1[1] - tour2.pos[1]) < (tour1[2] + tour2.radius) * (tour1[2] + tour2.radius) {
+		collision = true
+	}
+	return collision
+}
 
 fn min(x int, y int) int {
 	if x >= y {
