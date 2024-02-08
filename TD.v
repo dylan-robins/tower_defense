@@ -130,6 +130,7 @@ fn on_frame(mut app App) {
 			}
 		}
 		app.map.projectiles.delete(projectile_delete_indexes[0])
+		projectile_delete_indexes.delete(0)
 	}
 	
 	// Draw
@@ -151,6 +152,7 @@ fn on_frame(mut app App) {
 			}
 		}
 		app.map.ennemis.delete(indexes[0])
+		indexes.delete(0)
 	}
 	if app.map.placing_mode {
 		if app.map.can_place {
