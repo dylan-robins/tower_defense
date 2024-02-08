@@ -79,7 +79,7 @@ fn main() {
 fn on_frame(mut app App) {
 	app.frame_count += 1
 	if app.frame_count % 60  == 0 {
-		app.map.ennemis << Ennemi{pos_xy: app.map.ennemi_spawn[0].clone(), radius: 10, pos_relatif: 0, circuit: 0}
+		app.map.ennemis << Ennemi{pos_xy: app.map.ennemi_spawn[0].clone(), radius: 10, pos_relatif: 0, circuit: 0, pv: 5}
 	}
 	
 	mut distance_min := f32(90 * 90)
@@ -107,12 +107,29 @@ fn on_frame(mut app App) {
 		projectile.pos[0] += projectile.vecteur_directeur[0]
 		projectile.pos[1] += projectile.vecteur_directeur[1]
 		projectile.life_span -= 1
+		for mut ennemi in app.map.ennemis {
+			if gerer_collision_projectile_ennemi(ennemi, projectile) {
+				projectile.life_span = 0
+				ennemi.pv -= projectile.degats
+			}
+		}
 		if projectile.life_span <= 0 {
 			projectile_delete_indexes << app.map.projectiles.index(projectile)
 		}
 	}
-	for projectile_delete_index in projectile_delete_indexes {
-		app.map.projectiles.delete(projectile_delete_index)
+	dump(projectile_delete_indexes)
+	dump(projectile_delete_indexes.len)
+	dump(app.map.projectiles)
+	if app.map.projectiles.len > 0 {
+		dump(app.map.projectiles[0])
+	}
+	for projectile_delete_indexes.len > 0 {
+		for mut projectile_delete_index in projectile_delete_indexes {
+			if projectile_delete_indexes[0] < projectile_delete_index {
+				projectile_delete_index -= 1
+			}
+		}
+		app.map.projectiles.delete(projectile_delete_indexes[0])
 	}
 	
 	// Draw
@@ -121,14 +138,19 @@ fn on_frame(mut app App) {
 	mut indexes := []int{}
 	for mut ennemi in app.map.ennemis {
 		app.gg.draw_circle_filled(ennemi.pos_xy[0], ennemi.pos_xy[1], ennemi.radius, gg.Color{r: 255})
-		if ennemi.pos_relatif < app.map.circuits[ennemi.circuit].len - 1 {
+		if ennemi.pos_relatif < app.map.circuits[ennemi.circuit].len - 1 && ennemi.pv > 0{
 			ennemi.pos_relatif, ennemi.pos_xy =  ennemi.move(app.map.circuits[ennemi.circuit])
 		} else {
 			indexes << app.map.ennemis.index(ennemi)
 		}
 	}
-	for index in indexes {
-		app.map.ennemis.delete(index)
+	for indexes.len > 0 {
+		for mut index in indexes {
+			if indexes[0] < index {
+				index -=1
+			}
+		}
+		app.map.ennemis.delete(indexes[0])
 	}
 	if app.map.placing_mode {
 		if app.map.can_place {
@@ -148,7 +170,7 @@ fn on_frame(mut app App) {
 		for ennemi in app.map.ennemis {
 			if tour.detect(ennemi) && tour.cooldown == 0 {
 				tour.cooldown = 60
-				app.map.projectiles << Projectile{radius: 2, pos: [f32(tour.pos[0]), f32(tour.pos[1])], vitesse: 750, life_span: 120}
+				app.map.projectiles << Projectile{radius: 2, pos: [f32(tour.pos[0]), f32(tour.pos[1])], vitesse: 750, life_span: 120, degats: 1}
 				app.map.projectiles[app.map.projectiles.len - 1].vecteur_directeur = app.map.projectiles[app.map.projectiles.len - 1].find_vector(ennemi, app.map.circuits[ennemi.circuit])
 			}
 		}
@@ -211,6 +233,14 @@ fn (p Projectile) find_vector (ennemi Ennemi, circuit[][]f32) []f32 {
 fn gerer_collision_tour (tour1 []int, tour2 Tower) bool {
 	mut collision := false
 	if (tour1[0] - tour2.pos[0]) * (tour1[0] - tour2.pos[0]) + (tour1[1] - tour2.pos[1]) * (tour1[1] - tour2.pos[1]) < (tour1[2] + tour2.radius) * (tour1[2] + tour2.radius) {
+		collision = true
+	}
+	return collision
+}
+
+fn gerer_collision_projectile_ennemi (ennemi Ennemi, projectile Projectile) bool {
+	mut collision := false
+	if (ennemi.pos_xy[0] - projectile.pos[0]) * (ennemi.pos_xy[0] - projectile.pos[0]) + (ennemi.pos_xy[1] - projectile.pos[1]) * (ennemi.pos_xy[1] - projectile.pos[1]) < (ennemi.radius + projectile.radius) * (ennemi.radius + projectile.radius) {
 		collision = true
 	}
 	return collision
