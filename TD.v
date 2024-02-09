@@ -122,9 +122,6 @@ fn on_frame(mut app App) {
 				projectile_delete_indexes << app.map.projectiles.index(projectile)
 			}
 		}
-		if app.map.projectiles.len > 0 {
-			dump(app.map.projectiles[0])
-		}
 		for projectile_delete_indexes.len > 0 {
 			for mut projectile_delete_index in projectile_delete_indexes {
 				if projectile_delete_indexes[0] < projectile_delete_index {
