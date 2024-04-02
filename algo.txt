@@ -124,6 +124,27 @@ prototype:
 	fn gerer_collisions () () {}
 		
 	
+prototype 2
+	nv circuit
+	struct Map:
+		tours_type []Tower
+		ennemi_type []Ennemi
+		hero Hero
+		tower_to_place int
+	
+	struct Hero:
+		max_pv int
+		pv f32
+		degats f32
+		vision int
+	
+	struct Ennemi:
+		lateral f32 // [-5;5]
+	
+	fn (e Ennemi) move () () {}
+		lateral movement 
+	
+	fn (h Hero) move () () {}
 	
 	
 	
@@ -139,8 +160,4 @@ prototype:
 	
 	
 	
-	
-	
-	
-	
-	
+nb_pompes : |||||||||||||||||||||||||||
