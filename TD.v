@@ -20,29 +20,20 @@ mut:
 
 struct Map {
 mut:
-	circuits     [][][][]f32
+	circuits       [][][][]f32
 	//hero          Hero
 	projectiles   []Projectile
 	tours         []Tower
 	ennemis       []Ennemi
 	pv            int
-	placing_mode  bool
-	can_place     bool
-	money         int
-	hero_selected bool
-	difficulte    int = 0
-	vague         int
-}
-
-struct Tower {
-	radius int
-	range  int
-	degats int
-	pos    []int
-	prix   int
-	bullet_speed int
-mut:
-	cooldown int = 60
+	type_de_tours []Tower = [Gun{}, Gattling{}, Sniper{}, Laser{}]
+	tour_a_placer int
+	placing_mode   bool
+	can_place      bool
+	money          int
+	hero_selected  bool
+	difficulte     int = 0
+	vague          int
 }
 
 struct Projectile {
@@ -115,7 +106,7 @@ fn on_frame(mut app App) {
 			money: 40
 			pv: 10
 		}
-		app.frame_count = app.map.difficulte
+		app.frame_count = app.map.difficulte * 3600
 		app.map.circuits << [][][]f32{}
 		app.map.circuits[0] << [][]f32{len: 21000, init: [circuit_compose1lane1(index)[0], circuit_compose1lane1(index)[1]]}
 		app.map.circuits[0] << [][]f32{len: 22000, init: [circuit_compose1lane2(index)[0], circuit_compose1lane2(index)[1]]}
@@ -250,7 +241,7 @@ fn on_frame(mut app App) {
 					mut new_ennemi := app.map.ennemis[app.map.ennemis.len - 1]
 					new_ennemi.pos_xy = app.map.circuits[new_ennemi.circuit][new_ennemi.lane][0]
 				}
-			} else if app.frame_count > 25500 {
+			} else if app.frame_count > 25500 && app.frame_count < 28800 {
 				app.map.ennemis << Giant{
 					pos_relatif: 0
 					circuit: 0
@@ -258,17 +249,25 @@ fn on_frame(mut app App) {
 				}
 				mut new_ennemi := app.map.ennemis[app.map.ennemis.len - 1]
 				new_ennemi.pos_xy = app.map.circuits[new_ennemi.circuit][new_ennemi.lane][0]
+			} else if app.frame_count > 28800 && !(app.frame_count % 240 == 0) && !(app.frame_count % 180 == 0) && !(app.frame_count % 120 == 0) {
+				app.map.ennemis << OrcChieftain{
+					pos_relatif: 0
+					circuit: 0
+					lane: rand.int_in_range(0, 3) or {0}
+				}
+				mut new_ennemi := app.map.ennemis[app.map.ennemis.len - 1]
+				new_ennemi.pos_xy = app.map.circuits[new_ennemi.circuit][new_ennemi.lane][0]
+			} else if app.frame_count > 39600 {
+				app.map.ennemis << OrcChieftain{
+					pos_relatif: 0
+					circuit: 0
+					lane: rand.int_in_range(0, 3) or {0}
+				}
+				mut new_ennemi := app.map.ennemis[app.map.ennemis.len - 1]
+				new_ennemi.pos_xy = app.map.circuits[new_ennemi.circuit][new_ennemi.lane][0]
 			}
-		} else if app.frame_count > 28800  && app.frame_count % 30 == 0 {
-			app.map.ennemis << Giant{
-				pos_relatif: 0
-				circuit: 0
-				lane: rand.int_in_range(0, 3) or {0}
-			}
-			mut new_ennemi := app.map.ennemis[app.map.ennemis.len - 1]
-			new_ennemi.pos_xy = app.map.circuits[new_ennemi.circuit][new_ennemi.lane][0]
-		} else if app.frame_count > 32400 {
-			app.map.ennemis << Giant{
+		} else if app.frame_count > 50400 {
+			app.map.ennemis << OrcChieftain{
 				pos_relatif: 0
 				circuit: 0
 				lane: rand.int_in_range(0, 3) or {0}
@@ -289,21 +288,21 @@ fn on_frame(mut app App) {
 	
 		app.map.vague = int(app.frame_count / 3600) + 1
 
-		mut distance_min := f32(60 * 60)
+		mut collision := false
+		mut distance_min := f32((50 +  app.map.type_de_tours[app.map.tour_a_placer].radius) * (50 +  app.map.type_de_tours[app.map.tour_a_placer].radius))
 		for circuit in app.map.circuits {
 			for point_circuit in circuit[1] {
 				if dist(point_circuit, [f32(app.gg.mouse_pos_x), f32(app.gg.mouse_pos_y)]) < distance_min {
-					distance_min = dist(point_circuit, [f32(app.gg.mouse_pos_x), f32(app.gg.mouse_pos_y)])
+					collision = true
 				}
 			}
 		}
-		mut collision := false
 		for tours in app.map.tours {
-			if gerer_collision_tour([app.gg.mouse_pos_x, app.gg.mouse_pos_y, 10], tours) {
+			if gerer_collision_tour([app.gg.mouse_pos_x, app.gg.mouse_pos_y, app.map.type_de_tours[app.map.tour_a_placer].radius], tours) {
 				collision = true
 			}
 		}
-		if distance_min < 60 * 60 || collision || app.map.money < 10 {
+		if collision || app.map.money < app.map.type_de_tours[app.map.tour_a_placer].prix {
 			app.map.can_place = false
 		} else {
 			app.map.can_place = true
@@ -311,11 +310,10 @@ fn on_frame(mut app App) {
 
 		mut projectile_delete_indexes := []int{}
 		for mut projectile in app.map.projectiles {
-			projectile.pos[0] += projectile.vecteur_directeur[0]
-			projectile.pos[1] += projectile.vecteur_directeur[1]
+			projectile.pos = [projectile.pos[0] + projectile.vecteur_directeur[0], projectile.pos[1] + projectile.vecteur_directeur[1]].clone()
 			projectile.life_span -= 1
 			for mut ennemi in app.map.ennemis {
-				if gerer_collision_projectile_ennemi(ennemi, projectile) {
+				if gerer_collision_projectile_ennemi(ennemi, projectile) && projectile.life_span != 0 {
 					projectile.life_span = 0
 					ennemi.pv -= projectile.degats
 				}
@@ -323,6 +321,9 @@ fn on_frame(mut app App) {
 			if projectile.life_span <= 0 {
 				projectile_delete_indexes << app.map.projectiles.index(projectile)
 			}
+			/*for mut tour in app.map.tours {
+				tour.bullet.pos = [f32(tour.pos[0]), f32(tour.pos[1])]
+			}*/
 		}
 		for projectile_delete_indexes.len > 0 {
 			for mut projectile_delete_index in projectile_delete_indexes {
@@ -387,16 +388,11 @@ fn on_frame(mut app App) {
 		}
 	}
 	for indexes.len > 0 {
-		for mut index in indexes {
-			if indexes[0] < index {
-				index -= 1
-			}
-		}
 		if app.map.pv > 0 {
 			if app.map.ennemis[indexes[0]].pos_relatif == app.map.circuits[app.map.ennemis[indexes[0]].circuit][app.map.ennemis[indexes[0]].lane].len - 1 {
 				app.map.pv -= app.map.ennemis[indexes[0]].degats
 			} else {
-				app.map.money += 2
+				app.map.money += app.map.ennemis[indexes[0]].money
 			}
 		}
 		app.map.ennemis.delete(indexes[0])
@@ -405,26 +401,26 @@ fn on_frame(mut app App) {
 	
 	if app.map.placing_mode {
 		if app.map.can_place {
-			app.gg.draw_circle_filled(app.gg.mouse_pos_x, app.gg.mouse_pos_y, 10, gg.Color{
+			app.gg.draw_circle_filled(app.gg.mouse_pos_x, app.gg.mouse_pos_y, app.map.type_de_tours[app.map.tour_a_placer].radius, gg.Color{
 				r: 103
 				g: 103
 				b: 103
 				a: 150
 			})
-			app.gg.draw_circle_filled(app.gg.mouse_pos_x, app.gg.mouse_pos_y, 100, gg.Color{
+			app.gg.draw_circle_filled(app.gg.mouse_pos_x, app.gg.mouse_pos_y, app.map.type_de_tours[app.map.tour_a_placer].range, gg.Color{
 				r: 103
 				g: 103
 				b: 103
 				a: 50
 			})
 		} else {
-			app.gg.draw_circle_filled(app.gg.mouse_pos_x, app.gg.mouse_pos_y, 10, gg.Color{
+			app.gg.draw_circle_filled(app.gg.mouse_pos_x, app.gg.mouse_pos_y, app.map.type_de_tours[app.map.tour_a_placer].radius, gg.Color{
 				r: 220
 				g: 103
 				b: 103
 				a: 150
 			})
-			app.gg.draw_circle_filled(app.gg.mouse_pos_x, app.gg.mouse_pos_y, 100, gg.Color{
+			app.gg.draw_circle_filled(app.gg.mouse_pos_x, app.gg.mouse_pos_y, app.map.type_de_tours[app.map.tour_a_placer].range, gg.Color{
 				r: 220
 				g: 103
 				b: 103
@@ -455,17 +451,11 @@ fn on_frame(mut app App) {
 			}
 		}
 		if ls_dist.len > 0 {
-			app.map.projectiles << Projectile{
-				radius: 2
-				pos: [f32(tour.pos[0]), f32(tour.pos[1])]
-				vitesse: tour.bullet_speed
-				life_span: 120
-				degats: 1
-			}
+			app.map.projectiles << tour.bullet
 			ennemi_to_shoot := closest_ennemi(ls_dist, app)
 			app.map.projectiles[app.map.projectiles.len - 1].vecteur_directeur = app.map.projectiles[app.map.projectiles.len - 1].find_vector(ennemi_to_shoot,
 				app.map.circuits[ennemi_to_shoot.circuit][ennemi_to_shoot.lane])
-			tour.cooldown = 60
+			tour.cooldown = tour.base_cooldown
 		}
 	}
 	
@@ -484,18 +474,23 @@ fn on_frame(mut app App) {
 	if app.map.pv <= 0 {
 		app.gg.draw_text(app.size.width / 2 - 150, app.size.height / 2, 'YOU LOSE! You survived for ${app.frame_count / 60}seconds !')
 	}
-	app.gg.end()
+	app.gg.end(how: .clear)
 }
 
 fn on_event(e &gg.Event, mut app App) {
 	match e.typ {
 		.key_down {
 			match e.key_code {
-				.p {
-					if !app.map.placing_mode {
-						app.map.placing_mode = true
-					} else {
-						app.map.placing_mode = false
+				.b {
+					app.map.placing_mode = !app.map.placing_mode
+				}
+				.n {
+					app.map.tour_a_placer = (app.map.tour_a_placer + 1) % app.map.type_de_tours.len
+				}
+				.v {
+					app.map.tour_a_placer = (app.map.tour_a_placer - 1)
+					if app.map.tour_a_placer < 0 {
+						app.map.tour_a_placer = app.map.type_de_tours.len - 1
 					}
 				}
 				.escape {
@@ -508,13 +503,31 @@ fn on_event(e &gg.Event, mut app App) {
 			match e.key_code {
 				.enter {
 					if app.map.placing_mode && app.map.can_place {
-						app.map.tours << Tower{
-							radius: 10
-							pos: [app.gg.mouse_pos_x, app.gg.mouse_pos_y]
-							range: 100
-							bullet_speed: 15
+						if app.map.type_de_tours[app.map.tour_a_placer].type_name() == 'Gun' {
+							app.map.tours << Gun{
+								pos: [app.gg.mouse_pos_x, app.gg.mouse_pos_y]
+							}
+							app.map.tours[app.map.tours.len - 1].bullet.pos = [f32(app.map.tours[app.map.tours.len - 1].pos[0]), f32(app.map.tours[app.map.tours.len - 1].pos[1])]
+							app.map.money -= app.map.tours[app.map.tours.len - 1].prix
+						} else if app.map.type_de_tours[app.map.tour_a_placer].type_name() == 'Gattling' {
+							app.map.tours << Gattling{
+								pos: [app.gg.mouse_pos_x, app.gg.mouse_pos_y]
+							}
+							app.map.tours[app.map.tours.len - 1].bullet.pos = [f32(app.map.tours[app.map.tours.len - 1].pos[0]), f32(app.map.tours[app.map.tours.len - 1].pos[1])]
+							app.map.money -= app.map.tours[app.map.tours.len - 1].prix
+						} else if app.map.type_de_tours[app.map.tour_a_placer].type_name() == 'Sniper' {
+							app.map.tours << Sniper{
+								pos: [app.gg.mouse_pos_x, app.gg.mouse_pos_y]
+							}
+							app.map.tours[app.map.tours.len - 1].bullet.pos = [f32(app.map.tours[app.map.tours.len - 1].pos[0]), f32(app.map.tours[app.map.tours.len - 1].pos[1])]
+							app.map.money -= app.map.tours[app.map.tours.len - 1].prix
+						} else if app.map.type_de_tours[app.map.tour_a_placer].type_name() == 'Laser' {
+							app.map.tours << Laser{
+								pos: [app.gg.mouse_pos_x, app.gg.mouse_pos_y]
+							}
+							app.map.tours[app.map.tours.len - 1].bullet.pos = [f32(app.map.tours[app.map.tours.len - 1].pos[0]), f32(app.map.tours[app.map.tours.len - 1].pos[1])]
+							app.map.money -= app.map.tours[app.map.tours.len - 1].prix
 						}
-						app.map.money -= 10
 					}
 				}
 				else {}
@@ -522,13 +535,31 @@ fn on_event(e &gg.Event, mut app App) {
 		}
 		.mouse_up {
 			if app.map.placing_mode && app.map.can_place {
-				app.map.tours << Tower{
-					radius: 10
-					pos: [app.gg.mouse_pos_x, app.gg.mouse_pos_y]
-					range: 100
-					bullet_speed: 15
+				if app.map.type_de_tours[app.map.tour_a_placer].type_name() == 'Gun' {
+					app.map.tours << Gun{
+						pos: [app.gg.mouse_pos_x, app.gg.mouse_pos_y]
+					}
+					app.map.tours[app.map.tours.len - 1].bullet.pos = [f32(app.map.tours[app.map.tours.len - 1].pos[0]), f32(app.map.tours[app.map.tours.len - 1].pos[1])]
+					app.map.money -= app.map.tours[app.map.tours.len - 1].prix
+				} else if app.map.type_de_tours[app.map.tour_a_placer].type_name() == 'Gattling' {
+					app.map.tours << Gattling{
+						pos: [app.gg.mouse_pos_x, app.gg.mouse_pos_y]
+					}
+					app.map.tours[app.map.tours.len - 1].bullet.pos = [f32(app.map.tours[app.map.tours.len - 1].pos[0]), f32(app.map.tours[app.map.tours.len - 1].pos[1])]
+					app.map.money -= app.map.tours[app.map.tours.len - 1].prix
+				} else if app.map.type_de_tours[app.map.tour_a_placer].type_name() == 'Sniper' {
+					app.map.tours << Sniper{
+						pos: [app.gg.mouse_pos_x, app.gg.mouse_pos_y]
+					}
+					app.map.tours[app.map.tours.len - 1].bullet.pos = [f32(app.map.tours[app.map.tours.len - 1].pos[0]), f32(app.map.tours[app.map.tours.len - 1].pos[1])]
+					app.map.money -= app.map.tours[app.map.tours.len - 1].prix
+				} else if app.map.type_de_tours[app.map.tour_a_placer].type_name() == 'Laser' {
+					app.map.tours << Laser{
+						pos: [app.gg.mouse_pos_x, app.gg.mouse_pos_y]
+					}
+					app.map.tours[app.map.tours.len - 1].bullet.pos = [f32(app.map.tours[app.map.tours.len - 1].pos[0]), f32(app.map.tours[app.map.tours.len - 1].pos[1])]
+					app.map.money -= app.map.tours[app.map.tours.len - 1].prix
 				}
-				app.map.money -= 10
 			}
 			/* else if app.map.hero_selected {
 				app.map.hero_selected = false
@@ -550,17 +581,6 @@ fn (e Ennemi) move(circuit [][]f32) (int, []f32) {
 	} else {
 		return circuit.len - 1, circuit[circuit.len - 1].clone()
 	}
-}
-
-fn (t Tower) detect(e Ennemi, app App) bool {
-	mut detection := false
-	if e.pos_relatif + e.vitesse * t.bullet_speed < app.map.circuits[e.circuit][e.lane].len {
-		if dist(app.map.circuits[e.circuit][e.lane][e.pos_relatif + e.vitesse * t.bullet_speed], [f32(t.pos[0]), f32(t.pos[1])]) <= (t.range + e.radius) * (
-			t.range + e.radius) {
-			detection = true
-		}
-	}
-	return detection
 }
 
 /*
