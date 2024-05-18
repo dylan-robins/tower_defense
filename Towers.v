@@ -14,15 +14,15 @@ struct Gattling {
 	range  int = 75
 	pos    []int
 	prix   int = 20
-	base_cooldown int = 5
+	base_cooldown int = 15
 mut:
 	bullet Projectile = Projectile{
 		radius: 2
 		vitesse: 10
 		life_span: 60
-		degats: 1
+		degats: 2
 	}
-	cooldown int = 5
+	cooldown int = 15
 }
 
 struct Gun {
