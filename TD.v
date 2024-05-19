@@ -2,8 +2,8 @@ import rand
 import gg
 import math
 
-const win_width = 601
-const win_height = 601
+const win_width = 1366
+const win_height = 768
 const bg_color = gg.Color{
 	r: 0
 	g: 200
