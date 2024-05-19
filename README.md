@@ -19,8 +19,9 @@ echap									=> pause menu
 ## LEADERBOARDS
 ### SURVIVING THE LONGEST
 
-1. 609s -> Slimexandre
-2. 606s -> Robin21_VT
-2. 601s -> Sh.a D'eau (CuteWaterKitty)
-3. 152s -> Sinj
-4. 150s -> Kis
+1) 609s -> Slimexandre
+2) 606s -> Robin21_VT
+3) 601s -> Sh.a D'eau (CuteWaterKitty)
+3) 601s -> Tenkuro
+4) 152s -> Sinj
+5) 150s -> Kis
