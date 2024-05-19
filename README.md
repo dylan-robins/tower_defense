@@ -6,6 +6,7 @@ Expected screen width and height |=> 1366px by 768px
 
 
 ## CONTROLS
+
 B										=> enter Build mode
 
 N/V while in build mode					=> select tower
@@ -21,3 +22,4 @@ echap									=> pause menu
 1. 609s -> Slimexandre
 2. 601s -> Sh.a D'eau (CuteWaterKitty)
 3. 152s -> Sinj
+4. 150s -> Kis
