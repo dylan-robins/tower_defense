@@ -4,6 +4,7 @@ An amazing TD
 
 Expected screen width and height |=> 1366px by 768px
 
+
 ## Controls
 B										=> enter Build mode
 
@@ -13,7 +14,8 @@ left click/enter while in build mode	=> place tower
 
 echap									=> pause menu
 
+
 ## Leaderboards
-**SURVIVING THE LONGEST**
+###SURVIVING THE LONGEST
 
 601s -> Sh.a D'eau (CuteWaterKitty)
