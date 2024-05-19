@@ -18,4 +18,6 @@ echap									=> pause menu
 ## LEADERBOARDS
 ### SURVIVING THE LONGEST
 
-601s -> Sh.a D'eau (CuteWaterKitty)
+1. 609s -> Slimexandre
+2. 601s -> Sh.a D'eau (CuteWaterKitty)
+3. 152s -> Sinj
