@@ -20,6 +20,7 @@ echap									=> pause menu
 ### SURVIVING THE LONGEST
 
 1. 609s -> Slimexandre
+2. 606s -> Robin21_VT
 2. 601s -> Sh.a D'eau (CuteWaterKitty)
 3. 152s -> Sinj
 4. 150s -> Kis
