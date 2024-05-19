@@ -513,7 +513,7 @@ fn on_event(e &gg.Event, mut app App) {
 		.key_up {
 			match e.key_code {
 				.enter {
-					if app.map.placing_mode && app.map.can_place {
+					if app.map.placing_mode && app.map.can_place && app.map.pv > 0 {
 						if app.map.type_de_tours[app.map.tour_a_placer].type_name() == 'Gun' {
 							app.map.tours << Gun{
 								pos: [app.gg.mouse_pos_x, app.gg.mouse_pos_y]
@@ -553,7 +553,7 @@ fn on_event(e &gg.Event, mut app App) {
 						app.gg.quit()
 					}
 				}
-			} else if app.map.placing_mode && app.map.can_place {
+			} else if app.map.placing_mode && app.map.can_place && app.map.pv > 0 {
 				if app.map.type_de_tours[app.map.tour_a_placer].type_name() == 'Gun' {
 					app.map.tours << Gun{
 						pos: [app.gg.mouse_pos_x, app.gg.mouse_pos_y]
