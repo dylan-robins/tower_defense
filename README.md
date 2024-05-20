@@ -23,12 +23,12 @@ echap									=> pause menu
 
 2\. 608s -> Robin21_VT
 
-3\. 601s -> Sh.a D'eau (CuteWaterKitty)
+3\. 607s -> Tenkuro
 
-3\. 601s -> Tenkuro
+4\. 601s -> Sh.a D'eau (CuteWaterKitty)
 
-4\. 547s -> Quaboza11
+5\. 547s -> Quaboza11
 
-5\. 152s -> Sinj
+6\. 152s -> Sinj
 
-6\. 150s -> Kis
+7\. 150s -> Kis
