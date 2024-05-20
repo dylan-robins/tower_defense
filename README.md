@@ -36,33 +36,49 @@ Expected screen width and height |=> 1366px by 768px
 
 1. Goblin (Small) 
 	> 20 hp
+	
 	> 1 dmg
+	
 	> 5 speed
+	
 	> 1 money
 
 2. Orc (Medium)
 	> 60 hp
+	
 	> 1 dmg
+	
 	> 5 speed
+	
 	> 2 money
 
 3. Hyena (Tiny)
 	> 20 hp
+	
 	> 1 dmg
+	
 	> 15 speed
+	
 	> 1 money
 
 4. Giant (Big)
 	> 180 hp
+	
 	> 2 dmg
+	
 	> 2 speed
+	
 	> 3 money
 
 5. Orc Chieftain (Huge)
 	> 3600 hp
+	
 	> 10 dmg
+	
 	> 3 speed
+	
 	> 10 money
+	
 	> Boss
 
 
