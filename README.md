@@ -110,14 +110,16 @@ echap									=> pause menu
 
 1\. 609s -> Slimexandre
 
+2\. 608s -> aspaspaspasp
+
 2\. 608s -> Robin21_VT
 
-3\. 607s -> Tenkuro
+4\. 607s -> Tenkuro
 
-4\. 601s -> Sh.a D'eau (CuteWaterKitty)
+5\. 601s -> Sh.a D'eau (CuteWaterKitty)
 
-5\. 547s -> Quaboza11
+6\. 547s -> Quaboza11
 
-6\. 152s -> Sinj
+7\. 152s -> Sinj
 
-7\. 150s -> Kis
+8\. 150s -> Kis
