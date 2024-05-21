@@ -116,10 +116,12 @@ echap									=> pause menu
 
 4\. 607s -> Tenkuro
 
+5\. 601s -> Linklancien
+
 5\. 601s -> Sh.a D'eau (CuteWaterKitty)
 
-6\. 547s -> Quaboza11
+7\. 547s -> Quaboza11
 
-7\. 152s -> Sinj
+8\. 152s -> Sinj
 
-8\. 150s -> Kis
+9\. 150s -> Kis
