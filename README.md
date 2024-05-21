@@ -125,3 +125,5 @@ echap									=> pause menu
 8\. 152s -> Sinj
 
 9\. 150s -> Kis
+
+10\. 149s -> toubisou
