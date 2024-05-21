@@ -465,11 +465,14 @@ fn on_frame(mut app App) {
 				tour.cooldown = tour.base_cooldown
 			}
 		}
+		app.gg.end(how: .passthru)
 		
 		/*
 		if app.map.hero.pv > 0 {
 			app.gg.draw_circle_filled(app.map.hero.pos[0], app.map.hero.pos[1], app.map.hero.radius_size, gg.Color{ b: 255 })
 		}*/
+		
+		app.gg.begin()
 		for projectile in app.map.projectiles {
 			app.gg.draw_circle_filled(projectile.pos[0], projectile.pos[1], projectile.radius,
 				gg.Color{})
@@ -477,7 +480,7 @@ fn on_frame(mut app App) {
 		
 		app.gg.show_fps()
 		app.gg.draw_text(app.size.width - 150, 10, 'money : ${app.map.money}    pv : ${app.map.pv}')
-		app.gg.draw_text(30, 10, 'vague : ${app.map.vague}')
+		app.gg.draw_text(30, 10, 'vague : ${app.map.vague}    time : ${app.frame_count/60}s')
 		if app.map.pv <= 0 {
 			app.gg.draw_text(app.size.width / 2 - 150, app.size.height / 2, 'YOU LOSE! You survived for ${app.frame_count / 60}seconds !')
 		}

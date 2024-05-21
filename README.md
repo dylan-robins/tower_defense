@@ -108,13 +108,13 @@ echap									=> pause menu
 ## LEADERBOARDS
 ### SURVIVING THE LONGEST
 
-1\. 609s -> Slimexandre
+1\. 718s -> Tenkuro
 
-2\. 608s -> aspaspaspasp
+2\. 609s -> Slimexandre
 
-2\. 608s -> Robin21_VT
+3\. 608s -> aspaspaspasp
 
-4\. 607s -> Tenkuro
+3\. 608s -> Robin21_VT
 
 5\. 601s -> Linklancien
 
