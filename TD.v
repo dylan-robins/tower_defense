@@ -488,7 +488,8 @@ fn on_frame(mut app App) {
 		app.gg.draw_rect_filled(app.size.width / 2 - 250, app.size.height / 2 - 75, 500, 150, gg.Color{ r: 155, g: 123, b: 91})
 		app.gg.draw_rect_filled(app.size.width / 2 - 225, app.size.height / 2 - 50, 125, 100, gg.Color{ r: 120, g: 88, b: 56})
 		app.gg.draw_rect_filled(app.size.width / 2 + 100, app.size.height / 2 - 50, 125, 100, gg.Color{ r: 120, g: 88, b: 56})
-		app.gg.draw_text(app.size.width / 2 - 200, app.size.height / 2 - 10, ' Continue ?                                                                    Quit ?')
+		app.gg.draw_rect_filled(app.size.width / 2 - 62, app.size.height / 2 - 50, 125, 100, gg.Color{ r: 120, g: 88, b: 56})
+		app.gg.draw_text(app.size.width / 2 - 200, app.size.height / 2 - 10, ' Continue ?                         Restart ?                            Quit ?')
 		app.gg.end(how: .clear)
 	}
 }
@@ -553,6 +554,9 @@ fn on_event(e &gg.Event, mut app App) {
 			if app.escaped {
 				if app.gg.mouse_pos_y >= app.size.height / 2 - 50 && app.gg.mouse_pos_y <= app.size.height / 2 + 50 {
 					if app.gg.mouse_pos_x >= app.size.width / 2 - 225 && app.gg.mouse_pos_x <= app.size.width / 2 - 100 {
+						app.escaped = false
+					} else if app.gg.mouse_pos_x >= app.size.width / 2 - 62 && app.gg.mouse_pos_x <= app.size.width / 2 + 63 {
+						app.frame_count = 0
 						app.escaped = false
 					} else if app.gg.mouse_pos_x >= app.size.width / 2 + 100 && app.gg.mouse_pos_x <= app.size.width / 2 + 225 {
 						app.gg.quit()
