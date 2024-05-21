@@ -374,6 +374,9 @@ fn on_frame(mut app App) {
 
 		// Draw
 		app.gg.begin()
+		app.gg.end(how: .clear)
+		
+		app.gg.begin()
 		app.gg.draw_rect_filled(0, 484 - 50, 1000 + 50, 100, gg.Color{ r: 217, g: 186, b: 111 })
 		app.gg.draw_rect_filled(0, 284 - 50, 1000 + 50, 100, gg.Color{ r: 217, g: 186, b: 111 })
 		app.gg.draw_rect_filled(1000 - 50, 284 - 50, 100, 200, gg.Color{ r: 217, g: 186, b: 111 })
@@ -400,7 +403,9 @@ fn on_frame(mut app App) {
 			app.map.ennemis.delete(indexes[0])
 			indexes.delete(0)
 		}
+		app.gg.end(how: .passthru)
 		
+		app.gg.begin()
 		if app.map.placing_mode {
 			if app.map.can_place {
 				app.gg.draw_circle_filled(app.gg.mouse_pos_x, app.gg.mouse_pos_y, app.map.type_de_tours[app.map.tour_a_placer].radius, gg.Color{
@@ -476,7 +481,7 @@ fn on_frame(mut app App) {
 		if app.map.pv <= 0 {
 			app.gg.draw_text(app.size.width / 2 - 150, app.size.height / 2, 'YOU LOSE! You survived for ${app.frame_count / 60}seconds !')
 		}
-		app.gg.end(how: .clear)
+		app.gg.end(how: .passthru)
 	} else {
 		app.gg.begin()
 		app.gg.draw_rect_filled(0, 0, app.size.width, app.size.height, gg.Color{ r: 53, g: 53, b: 53})
