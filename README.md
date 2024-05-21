@@ -122,8 +122,8 @@ echap									=> pause menu
 
 7\. 547s -> Quaboza11
 
-8\. 152s -> Sinj
+8\. 155s -> toubisou
 
-9\. 150s -> Kis
+9\. 152s -> Sinj
 
-10\. 149s -> toubisou
+10\. 150s -> Kis
