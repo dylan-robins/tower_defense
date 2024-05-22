@@ -36,24 +36,6 @@ fn (mut app App) do_first_frame() {
 	app.map.circuits[0] << [][]f32{len: 23000, init: [circuit_compose1lane3(index)[0], circuit_compose1lane3(index)[1]]}
 }
 
-fn (btn Button) draw(app App) {
-	// Draw button background
-	app.gg.draw_rect_filled(
-		(btn.center.x - 0.5*btn.size.x),
-		(btn.center.y - 0.5*btn.size.y),
-		btn.size.x,
-		btn.size.y,
-		btn.color
-	)
-	// Draw button text
-	text_config := gx.TextCfg{
-		align: .center
-		vertical_align: .middle
-	}
-	println("Printing button")
-	app.gg.draw_text(int(btn.center.x), int(btn.center.y), btn.text, text_config)
-}
-
 fn (mut app App) do_pause_menu() {
 	window_bg_color := gg.Color{ r: 53, g: 53, b: 53 }
 	
