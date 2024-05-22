@@ -1,4 +1,5 @@
 import gg
+import gx
 
 struct Vec2D {
 	x f32
