@@ -1,0 +1,163 @@
+TD
+map
+ennemis
+tours
+argent
+point de vie
+
+struct Ennemi:
+	pos_xy []int
+	pos_relatif int
+	circuit int
+	pv int
+	vitesse int
+	armure int
+	dégats int
+	money int
+
+struct Tower:
+	range int
+	dégats int
+	vitesse int
+	pos []int
+
+struct Projectile:
+	radius int
+	vitesse int
+	degats int
+	pos []int
+	life_span int
+
+struct Map:
+	ennemi_spawn [][]int
+	circuit [][][]int
+	tours []Tower
+	ennemis [] Ennemi
+	image str
+	money int
+	pv int
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+prototype:
+	struct Ennemi:
+		pos_xy []int
+		pos_relatif int
+		circuit int
+		pv int
+
+	struct Tower:
+		radius int
+		range int
+		dégats int
+		pos []int
+	
+	struct Projectile:
+		radius int
+		vitesse int
+		degats int
+		pos []int
+		life_span int
+	
+	struct Map:
+		ennemi_spawn [][]int
+		tours []Tower
+		ennemis [] Ennemi
+		circuits [][][]int
+		pv int
+
+
+
+
+	fn (t Tower) placer_tour () () {}
+		
+	fn (m Map) placer_ennemi () () {}
+		
+	fn (e Ennemi) deplacer_ennemi () () {}
+		
+	fn (t Tower) shoot () () {}
+		
+	fn (p Projectile) move_projectile () () {}
+		
+	fn gerer_collisions () () {}
+		
+	
+prototype 2
+	nv circuit
+	struct Map:
+		tours_type []Tower
+		ennemi_type []Ennemi
+		hero Hero
+		tower_to_place int
+	
+	struct Hero:
+		max_pv int
+		pv f32
+		degats f32
+		vision int
+	
+	struct Ennemi:
+		lateral f32 // [-5;5]
+	
+	fn (e Ennemi) move () () {}
+		lateral movement 
+	
+	fn (h Hero) move () () {}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+nb_pompes : |||||||||||||||||||||||||||

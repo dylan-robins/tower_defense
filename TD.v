@@ -2,21 +2,10 @@ import rand
 import gg
 import math
 
-const win_width = 1366
-const win_height = 768
 const bg_color = gg.Color{
 	r: 0
 	g: 200
 	b: 0
-}
-
-struct App {
-mut:
-	gg          &gg.Context = unsafe { nil }
-	frame_count int
-	map         Map
-	size        gg.Size
-	escaped     bool
 }
 
 struct Map {
@@ -33,7 +22,7 @@ mut:
 	can_place      bool
 	money          int
 	hero_selected  bool
-	difficulte     int = 0
+	difficulte     int
 	vague          int
 }
 
@@ -69,12 +58,14 @@ mut:
 }*/
 
 fn main() {
+	screen_size := gg.screen_size()
+
 	mut app := &App{}
 	app.gg = gg.new_context(
-		width: win_width
-		height: win_height
+		width: screen_size.width
+		height: screen_size.height
 		create_window: true
-		window_title: 'TD.v'
+		window_title: 'tower defense'
 		user_data: app
 		fullscreen: true
 		bg_color: bg_color
@@ -89,29 +80,7 @@ fn main() {
 
 fn on_frame(mut app App) {
 	if app.frame_count == 0 {
-		app.size = app.gg.window_size()
-		app.map = Map{
-			/*hero: Hero{
-				speed: 1
-				radius_size: 10
-				max_pv: 500
-				pos: [f32(500), f32(484)]
-				st&&by_pos: [f32(500), f32(484)]
-				degats: 5
-				vision: 100
-				portee: 5
-				respawn_time: 3600
-				respawn_cooldown: 3600
-				pv: 500
-			}*/
-			money: 40
-			pv: 10
-		}
-		app.frame_count = app.map.difficulte * 3600
-		app.map.circuits << [][][]f32{}
-		app.map.circuits[0] << [][]f32{len: 21000, init: [circuit_compose1lane1(index)[0], circuit_compose1lane1(index)[1]]}
-		app.map.circuits[0] << [][]f32{len: 22000, init: [circuit_compose1lane2(index)[0], circuit_compose1lane2(index)[1]]}
-		app.map.circuits[0] << [][]f32{len: 23000, init: [circuit_compose1lane3(index)[0], circuit_compose1lane3(index)[1]]}
+		app.do_first_frame()
 	}
 	if !app.escaped {
 		if app.map.pv > 0 {
@@ -486,14 +455,7 @@ fn on_frame(mut app App) {
 		}
 		app.gg.end(how: .passthru)
 	} else {
-		app.gg.begin()
-		app.gg.draw_rect_filled(0, 0, app.size.width, app.size.height, gg.Color{ r: 53, g: 53, b: 53})
-		app.gg.draw_rect_filled(app.size.width / 2 - 250, app.size.height / 2 - 75, 500, 150, gg.Color{ r: 155, g: 123, b: 91})
-		app.gg.draw_rect_filled(app.size.width / 2 - 225, app.size.height / 2 - 50, 125, 100, gg.Color{ r: 120, g: 88, b: 56})
-		app.gg.draw_rect_filled(app.size.width / 2 + 100, app.size.height / 2 - 50, 125, 100, gg.Color{ r: 120, g: 88, b: 56})
-		app.gg.draw_rect_filled(app.size.width / 2 - 62, app.size.height / 2 - 50, 125, 100, gg.Color{ r: 120, g: 88, b: 56})
-		app.gg.draw_text(app.size.width / 2 - 200, app.size.height / 2 - 10, ' Continue ?                         Restart ?                            Quit ?')
-		app.gg.end(how: .clear)
+		app.do_pause_menu()
 	}
 }
 
