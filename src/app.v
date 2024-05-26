@@ -42,26 +42,27 @@ fn (mut app App) do_pause_menu() {
 	app.gg.draw_rect_filled(0, 0, app.size.width, app.size.height, window_bg_color)
 	
 	app.gg.begin()
-
-	Button{
-		size: Vec2D{125, 100}
-		center: Vec2D{app.size.width / 2 - 200, app.size.height / 2}
-		text: "Continue ?"
+	
+	ButtonContainer{
+		children: [
+			Button{
+				size: Vec2D{180, 100}
+				center: Vec2D{app.size.width / 2 - 200, app.size.height / 2}
+				text: "Continue ?"
+			},
+			Button{
+				size: Vec2D{180, 100}
+				center: Vec2D{app.size.width / 2, app.size.height / 2}
+				text: "Restart ?"
+			},
+			Button{
+				size: Vec2D{180, 100}
+				center: Vec2D{app.size.width / 2 + 200, app.size.height / 2}
+				text: "Quit ?"
+			}
+		]
+		color: gg.Color{ r: 155, g: 123, b: 91}
 	}.draw(app)
-
-	Button{
-		size: Vec2D{125, 100}
-		center: Vec2D{app.size.width / 2, app.size.height / 2}
-		text: "Restart ?"
-	}.draw(app)
-
-	Button{
-		size: Vec2D{125, 100}
-		center: Vec2D{app.size.width / 2 + 200, app.size.height / 2}
-		text: "Quit ?"
-	}.draw(app)
-	// btn area background
-	// app.gg.draw_rect_filled(app.size.width / 2 - 250, app.size.height / 2 - 75, 500, button_height+2*button_width, btn_area_bg_color)
 
 	app.gg.end(how: .clear)
 }

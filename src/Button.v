@@ -1,10 +1,6 @@
 import gg
 import gx
-
-struct Vec2D {
-	x f32
-	y f32
-}
+import arrays
 
 struct Button {
 mut:
@@ -12,6 +8,19 @@ mut:
 	center Vec2D @[required]
 	text string
 	color gg.Color = gg.Color{ r: 120, g: 88, b: 56}
+}
+
+fn (btn Button) bounding_box() BoundingBox {
+	return BoundingBox{
+		top_left: Vec2D{
+			x: btn.center.x - btn.size.x / 2
+			y: btn.center.y - btn.size.y / 2
+		}
+		bot_right: Vec2D{
+			x: btn.center.x + btn.size.x / 2
+			y: btn.center.y + btn.size.y / 2
+		}
+	}
 }
 
 fn (btn Button) draw(app App) {
@@ -29,4 +38,49 @@ fn (btn Button) draw(app App) {
 		vertical_align: .middle
 	}
 	app.gg.draw_text(int(btn.center.x), int(btn.center.y), btn.text, text_config)
+}
+
+struct ButtonContainer {
+	children []Button @[required]
+	color gg.Color @[required]
+	padding int = 20
+}
+
+fn (container ButtonContainer) bounding_box() BoundingBox {
+	child_bbs := container.children.map(it.bounding_box())
+	println(child_bbs)
+	return BoundingBox{
+		top_left: Vec2D{
+			x: arrays.min(child_bbs.map(it.top_left.x)) or {panic(err)} - container.padding
+			y: arrays.min(child_bbs.map(it.top_left.y)) or {panic(err)} - container.padding
+		}
+		bot_right: Vec2D{
+			x: arrays.max(child_bbs.map(it.bot_right.x)) or {panic(err)} + container.padding
+			y: arrays.max(child_bbs.map(it.bot_right.y)) or {panic(err)} + container.padding
+		}
+	}
+}
+
+fn (container ButtonContainer) draw(app App) {
+	// Draw button background
+
+	bb := container.bounding_box()
+	println(bb)
+
+	println("x = ${bb.top_left.x}")
+	println("y = ${bb.top_left.y}")
+	println("w = ${bb.bot_right.x - bb.top_left.x}")
+	println("h = ${bb.bot_right.y - bb.top_left.y}")
+	
+	app.gg.draw_rect_filled(
+		bb.top_left.x,
+		bb.top_left.y,
+		bb.bot_right.x - bb.top_left.x,
+		bb.bot_right.y - bb.top_left.y,
+		container.color
+	)
+	
+	for child in container.children {
+		child.draw(app)
+	}
 }
