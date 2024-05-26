@@ -48,7 +48,6 @@ struct ButtonContainer {
 
 fn (container ButtonContainer) bounding_box() BoundingBox {
 	child_bbs := container.children.map(it.bounding_box())
-	println(child_bbs)
 	return BoundingBox{
 		top_left: Vec2D{
 			x: arrays.min(child_bbs.map(it.top_left.x)) or {panic(err)} - container.padding
@@ -65,12 +64,6 @@ fn (container ButtonContainer) draw(app App) {
 	// Draw button background
 
 	bb := container.bounding_box()
-	println(bb)
-
-	println("x = ${bb.top_left.x}")
-	println("y = ${bb.top_left.y}")
-	println("w = ${bb.bot_right.x - bb.top_left.x}")
-	println("h = ${bb.bot_right.y - bb.top_left.y}")
 	
 	app.gg.draw_rect_filled(
 		bb.top_left.x,
